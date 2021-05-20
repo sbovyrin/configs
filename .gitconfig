@@ -1,0 +1,27 @@
+[diff]
+	tool = nvimdiff
+[difftool "nvimdiff"]
+	cmd = "nvim -d \"$LOCAL\" \"$REMOTE\""
+
+[color "status"]
+	branch = magenta
+	localBranch = magenta
+	remoteBranch = blue
+	nobranch = red
+	added = green
+	changed = yellow
+	untracked = red
+	deleted = brighblack
+
+[color "diff"]
+	meta = italic brightblack
+	frag = brightblack
+	commit = magenta
+	func = yellow
+	old = red
+	new = green
+
+[color "branch"]
+	current = magenta
+	local = black
+	remote = brightblack

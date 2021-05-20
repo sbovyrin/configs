@@ -1,0 +1,64 @@
+#!/usr/bin/env sh
+
+alias e=$EDITOR
+
+alias ls='ls -a --color=auto'
+alias ll='ls -lah'
+alias rm='rm -iv'
+alias cp='cp -iv'
+alias mv='mv -iv'
+alias mkdir='mkdir -pv'
+alias ..='cd ..'
+alias ...='cd ../..'
+
+which rg &>/dev/null \
+  && alias grep='rg --smart-case \
+    --colors=match:bg:magenta \
+    --colors=match:style:bold' \
+  || grep='grep --color=auto'
+
+alias to_list=fzf
+
+# package manager
+alias pi='apk add --no-cache'
+alias prm='apk del --purge'
+alias pup='apk update'
+alias pu='apk upgrade'
+
+# git
+alias gh='alias | grep --color=never ='"\'"'git'
+alias gs='git status -s -b'
+alias ga='git add $(git status -s | cut -d" " -f3 | fzf) && git commit'
+alias gaa='git add . && git commit'
+alias gr='git restore $(git status -s | cut -d" " -f3 | fzf)'
+alias gp='git push'
+alias gpl='git pull'
+alias gc='git clone'
+alias gb='git branch'
+alias gcb='git branch --show-current'
+alias gsb='git checkout $(git branch -la | fzf)'
+alias gnb='git checkout -b'
+alias gmb='git merge $(git branch -la | fzf)'
+alias gd='git difftool'
+
+# virtualization
+scan_docker_compose_configs() {
+  [[ -z "${_V_ENVS}" ]] \
+    && export _V_ENVS=$(find . -name '*docker-compose*yml' 2>/dev/null)
+}
+
+# TODO: use xargs?
+_v_env() {
+  docker-compose -f $(echo "${_V_ENVS}" | fzf) $@
+}
+
+alias vh='alias | grep --color=never ='"\'"'docker'
+alias vs='_v_env ps'
+alias vu='_v_env up -d'
+alias vd='_v_env down'
+alias vl='_v_env logs $(_v_env ps --services)'
+alias vx='_v_env exec $(_v_env ps --services)'
+
+alias exit="powershell.exe -command 'wsl --shutdown'"
+
+scan_docker_compose_configs
