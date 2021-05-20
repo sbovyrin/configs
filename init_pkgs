@@ -1,0 +1,15 @@
+#!/usr/bin/env sh
+
+set -euo pipefail
+
+install() {
+  apk add --no-cache $@
+}
+
+su
+
+apk update
+
+if which fzf &>/dev/null; then
+  install fzf
+fi
