@@ -3,35 +3,36 @@
 
 export TERM=xterm-256color
 
-# setting history
-## ignore duplicate lines and commands with leading space
+
+# Ignore duplicate lines and commands with leading space
 export HISTCONTROL=ignoreboth
-## amount of command history for current active bash session
+# Amount of command history for current active bash session
 export HISTSIZE=1000
-## amount of command history that was input at all
+# Amount of command history that was input at all
 export HISTFILESIZE=10000
 
-# set default editor
+# Set default editor
 export EDITOR=vi
 if which nvim &>/dev/null; then export EDITOR=nvim; fi
 
 export PAGER=less
-## set styles for `less` output
+# Set styles for `less` output
 export LESS_TERMCAP_md=$(tput bold; tput setaf 12)
 export LESS_TERMCAP_us=$(tput sitm; tput setaf 8)
 
-# expand aliases (to use in scripts)
+# Expand aliases (to use in scripts)
 shopt -s expand_aliases
-# save command to history after each input
+# Save command to history after each input
 shopt -s histappend
-# fix spelling errors for cd, only in interactive shell
+# Fix spelling errors for cd, only in interactive shell
 shopt -s cdspell
-# check the window size after each command and, if necessary,
-# update the values of LINES and COLUMNS.
+# Check the window size after each command and, if necessary,
+# Update the values of LINES and COLUMNS.
 shopt -s checkwinsize
-# save multiline command to history as single line
+# Save multiline command to history as single line
 shopt -s cmdhist
 
+# TODO: remove duplication
 _color() {
   local str="${1}\[$(tput sgr0)\]"
   local code=-1
@@ -88,8 +89,11 @@ dynamic_user_prompt() {
     local prompt=$(_color ">" "green")
   fi
 
-  local user_color="cyan"
-  if (( $UID == 0 )); then user_color="red"; fi
+  if (( $UID == 0 )); then
+    local user_color="red";
+  else
+    local user_color="cyan"
+  fi
 
   local time=$(_color "\t" $user_color)
   local dir=$(_color "\w" "yellow")
@@ -113,18 +117,14 @@ dynamic_user_prompt() {
   return 0
 }
 
-# enable save command of current session to history after input
-# enable dynamic user prompt
+# Enable save command of current session to history after input
+# Enable dynamic user prompt
 PROMPT_COMMAND="dynamic_user_prompt; history -a"
 
-##
-## LS
-##
+# LS
 eval $(dircolors | sed 's/01;/00;/g')
 
-##
-## FZF
-##
+# FZF
 [[ -f /usr/share/fzf/key-bindings.bash ]] \
   && source /usr/share/fzf/key-bindings.bash
 
@@ -141,15 +141,19 @@ export FZF_DEFAULT_OPTS="--ansi \
 export FZF_DEFAULT_COMMAND='rg --files -uu'
 export FZF_CTRL_T_COMMAND="${FZF_DEFAULT_COMMAND} 2>/dev/null"
 
-# remap Ctrl+t to Ctrl+f
+# Remap Ctrl+t to Ctrl+f
 bind -m emacs-standard -x '"\C-f": fzf-file-widget'
-bind -m vi-command -x '"\C-f": fzf-file-widget'
-bind -m vi-insert -x '"\C-f": fzf-file-widget'
 
 export FZF_ALT_C_COMMAND="rg --files \
   --no-messages \
   --null -uu ~ | xargs -0 dirname | sort | uniq"
 export FZF_ALT_C_OPTS=""
+
+
+# TODO: move to separate file (lib)
+whichos() {
+  cat /etc/os-release | grep "^ID=" | awk -F "=" '{print $2}'
+}
 
 if [[ -f ~/.aliases ]]; then . ~/.aliases; fi
 
@@ -158,9 +162,10 @@ if (( $(ps | grep 'ssh-agent' | wc -l) < 2 )); then
   ssh-add -q ${HOME}/.ssh/* &>/dev/null
 fi
 
-# autorun services
-if [[ ! -f "/run/openrc/softlevel" ]]; then
-  su -c "(rc-status  && touch /run/openrc/softlevel \
-    && rc-service docker start) &>/dev/null"
+# Autorun services
+if [[ $(whichos 2>/dev/null) == 'alpine' && ! -f "/run/openrc/softlevel" ]]; then
+  # if [[ ! -f "/run/openrc/softlevel" ]]; then
+    su -c "(rc-status  && touch /run/openrc/softlevel \
+      && rc-service docker start) &>/dev/null"
+  # fi
 fi
-

@@ -12,20 +12,31 @@ alias ..='cd ..'
 alias ...='cd ../..'
 
 which rg &>/dev/null \
-  && alias grep='rg --smart-case \
+  && alias grep="rg --smart-case \
     --colors=match:bg:magenta \
-    --colors=match:style:bold' \
+    --colors=match:style:bold" \
   || grep='grep --color=auto'
 
 alias to_list=fzf
 
-# package manager
-alias pi='apk add --no-cache'
-alias prm='apk del --purge'
-alias pup='apk update'
-alias pu='apk upgrade'
+##
+## Package manager
+##
+if [[ $(whichos 2>/dev/null) == 'alpine' ]]; then
+  alias pi='apk add --no-cache'
+  alias prm='apk del --purge'
+  alias pup='apk update'
+  alias pu='apk upgrade'
+elif [[ $(whichos 2>/dev/null) == 'ubuntu' ]]; then
+  alias pi='apt install --no-install-suggested'
+  alias prm='apt remove'
+  alias pup='apt update'
+  alias pu='apt upgrade'
+fi
 
-# git
+##
+## git
+##
 alias gh='alias | grep --color=never ='"\'"'git'
 alias gs='git status -s -b'
 alias ga='git add $(git status -s | cut -d" " -f3 | fzf) && git commit'
@@ -41,12 +52,13 @@ alias gnb='git checkout -b'
 alias gmb='git merge $(git branch -la | fzf)'
 alias gd='git difftool'
 
-# virtualization
+##
+## Virtualization
+##
 scan_docker_compose_configs() {
   [[ -z "${_V_ENVS}" ]] \
     && export _V_ENVS=$(find . -name '*docker-compose*yml' 2>/dev/null)
 }
-
 # TODO: use xargs?
 _v_env() {
   docker-compose -f $(echo "${_V_ENVS}" | fzf) $@
@@ -59,6 +71,8 @@ alias vd='_v_env down'
 alias vl='_v_env logs $(_v_env ps --services)'
 alias vx='_v_env exec $(_v_env ps --services)'
 
+
 alias exit="powershell.exe -command 'wsl --shutdown'"
 
+## Run functions
 scan_docker_compose_configs
