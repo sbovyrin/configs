@@ -202,6 +202,7 @@ hi! link mkdBlockquote TypeDef
 "" Error
 ""
 hi! link NvimInternalError ErrorMsg
+hi! link CocErrorSign Error
 
 ""
 "" Comment

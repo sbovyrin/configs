@@ -1,6 +1,8 @@
 " Enable using ctrl+z and ctrl+s without side-effects
 silent !stty -ixon
 
+"" darkbg: #073642 #002b36
+
 ""
 "" Built-in vimscript functions
 ""
@@ -282,11 +284,11 @@ fun! _select()
 endfun
 
 fun! _up()
-    return _old_pos() . _do("k") . _new_pos()
+    return _old_pos() . _do("gk") . _new_pos()
 endfun
 
 fun! _down()
-    return _old_pos() . _do("j") . _new_pos()
+    return _old_pos() . _do("gj") . _new_pos()
 endfun
 
 fun! _left()
@@ -708,11 +710,11 @@ fun! PhpSyntaxOverride()
     " arrow function keyword
     syn keyword phpKeyword fn self
     " fix highlighting built-in functions
-    syn keyword phpFunctions empty
+    syn keyword phpFunctions empty isset
     syn keyword phpKeyword abstract final private protected public static const
     " type in definition of function's parameter
     syn match phpType /\\\=\K\k\{-}\(\s\$\.\{-}\)\@=/ containedin=phpParent
-    syn match phpType /\():\s\=\)\@<=\\\=\K\k\+/
+    syn match phpType /\():\s\=\)\@<=\\\=\K\k\+\((\)\@!=/
     " const
     syn match phpConstants /[A-Z_]\+\>/
 endfun
@@ -721,8 +723,14 @@ fun! CssSyntaxOverride()
     syn keyword cssProp object-fit object-position
 endfun
 
+fun! ShellSyntaxOverride()
+    syn match shStatement /\$(\|\(\$.\{-}\)\@<=)/
+    syn keyword shStatement alias local
+endfun
+
 augroup syntaxOverride
   autocmd!
+  autocmd FileType sh call ShellSyntaxOverride()
   autocmd FileType php call PhpSyntaxOverride()
   autocmd FileType css call CssSyntaxOverride()
 augroup END
